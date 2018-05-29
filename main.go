@@ -14,8 +14,8 @@ func preRegistration(w http.ResponseWriter, r *http.Request) {
 		// TODO: Rather than simply print the email,
 		// we need to store the user as a tuple in PostgreSQL.
 	}
-	t, err := template.ParseFiles("templates/login.html") // Prepare the template for serving via the http.ResponseWriter
-	if err != nil {                                       // If an error was generated, we log fatally (equivalent to fmt.Println(err); os.Exit(1))
+	t, err := template.ParseFiles("templates/prereg.html") // Prepare the template for serving via the http.ResponseWriter
+	if err != nil {                                        // If an error was generated, we log fatally (equivalent to fmt.Println(err); os.Exit(1))
 		log.Fatal(err)
 	}
 	t.Execute(w, nil) // Give the template to http.ResponseWriter to display to the user.
