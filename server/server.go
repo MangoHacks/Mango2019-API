@@ -6,8 +6,8 @@ import (
 
 // Server represents an instance of the server and all the dependencies required across it.
 type Server struct {
-	DB     *string
-	Router *mux.Router
+	db     *string
+	router *mux.Router
 	email  string
 }
 
@@ -15,7 +15,7 @@ type Server struct {
 func New() *Server {
 	var s Server
 	r := mux.NewRouter()
-	s.Router = r
+	s.router = r
 	s.bindRoutes()
 	return &s
 }

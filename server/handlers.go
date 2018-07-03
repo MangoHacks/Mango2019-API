@@ -1,4 +1,4 @@
-package handlers
+package server
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 )
 
 // HandlePreregister routes a request to /preregister to the appropriate route.
-func HandlePreregister() http.HandlerFunc {
+func handlePreregister() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" { // If the client is sending us a payload (we define the method of an action in the template)
 			routes.PostPreregister(w, r)
