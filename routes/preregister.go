@@ -3,7 +3,6 @@ package routes
 import (
 	"database/sql"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -12,24 +11,22 @@ func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	type PreregisterRequest struct {
 		Email string `json:"email"`
 	}
-
-	defer r.Body.Close()
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		sendJSONResponse(w, 400, []byte("Invalid JSON"))
-		return
-	}
 	var prr PreregisterRequest
-	if err := json.Unmarshal(b, &prr); err != nil {
-		sendJSONResponse(w, 400, []byte("Invalid JSON"))
-		return
-	}
-	eml := prr.Email
-	if err := db.QueryRow("INSERT INTO preregistrations(email) VALUES($1)", eml).Scan(&eml); err != nil {
+
+	if err := readJSONBodyIntoStruct(r.Body, &prr); err != nil {
 		sendJSONResponse(w, 400, []byte(err.Error()))
 		return
 	}
-	sendJSONResponse(w, 200, []byte("ya tu sabes"))
+	eml := prr.Email
+
+	var e string
+	if err := db.QueryRow(`INSERT INTO preregistrations(email) 
+		VALUES($1) 
+		RETURNING email`, eml).Scan(&e); err != nil {
+		sendJSONResponse(w, 400, []byte(err.Error()))
+		return
+	}
+	sendJSONResponse(w, 200, []byte("OK"))
 }
 
 // GetPreregister handles a GET request to /preregister.
