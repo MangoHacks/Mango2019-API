@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 
 	// To avoid using pq directly.
 	_ "github.com/lib/pq"
@@ -9,8 +10,13 @@ import (
 
 // New constructs a new database connection.
 func New() (*sql.DB, error) {
-	connStr := "postgres://pqgotest:password@localhost/pqgotest?sslmode=verify-full"
-	db, err := sql.Open("postgres", connStr)
+	DBUser := "postgres"
+	DBPassword := "password"
+	DBName := "MangoHacks-2019"
+
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+		DBUser, DBPassword, DBName)
+	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
 		return nil, err
 	}

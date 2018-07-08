@@ -30,6 +30,7 @@ func newServer() (*server, error) {
 // bindHandlers sets the handler functions of the router.
 func (s *server) bindHandlers() {
 	s.router.HandleFunc("/preregister", handlePreregister(s.db))
+	s.router.HandleFunc("/register", handleRegister(s.db))
 }
 
 // StartServer starts a new server.
