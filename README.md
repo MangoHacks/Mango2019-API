@@ -4,10 +4,6 @@
 
 ## Running/Testing The Server
 
-1. `$ git clone` the repository into your `$GOPATH`.
-2. `$ go build` the binary within the directory the repository was cloned to.
-3. `$ ./Mango2019-API` to run the binary.
-4. Visit `localhost:8000/` in your browser.
-5. Enter your email in the form.
-6. Look at the server's output.
-7. Rejoice.
+1.  `$ git clone` the repository into your `$GOPATH`.
+2.  `$ go build` the binary within the directory the repository was cloned to.
+3.  `$ ./Mango2019-API` to run the binary.

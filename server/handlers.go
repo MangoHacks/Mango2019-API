@@ -1,18 +1,19 @@
 package server
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/MangoHacks/Mango2019-API/routes"
 )
 
-// HandlePreregister routes a request to /preregister to the appropriate route.
-func handlePreregister() http.HandlerFunc {
+// HandlePreregister handles a request to /preregister and sends them to the appropriate route.
+func handlePreregister(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" { // If the client is sending us a payload (we define the method of an action in the template)
-			routes.PostPreregister(w, r)
+		if r.Method == "POST" {
+			routes.PostPreregister(w, r, db)
 		} else if r.Method == "GET" {
-			routes.GetPreregister(w, r)
+			routes.GetPreregister(w, r, db)
 		}
 	}
 }
