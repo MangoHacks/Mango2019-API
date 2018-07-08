@@ -1,21 +1,45 @@
 package server
 
 import (
+	"database/sql"
+	"net/http"
+
+	"github.com/MangoHacks/Mango2019-API/database"
 	"github.com/gorilla/mux"
 )
 
-// Server represents an instance of the server and all the dependencies required across it.
-type Server struct {
-	db     *string
+// server represents an instance of the server and all the dependencies required across it.
+type server struct {
+	db     *sql.DB
 	router *mux.Router
-	email  string
 }
 
-// New returns a new pointer to a server.
-func New() *Server {
-	var s Server
+// newServer constructs a new server.
+func newServer() (*server, error) {
 	r := mux.NewRouter()
-	s.router = r
-	s.bindRoutes()
-	return &s
+	db, err := database.New()
+	if err != nil {
+		return nil, err
+	}
+	return &server{
+		router: r,
+		db:     db,
+	}, nil
+}
+
+func (s *server) bindHandlers() {
+	s.router.HandleFunc("/preregister", handlePreregister())
+}
+
+// StartServer starts a new server.
+func StartServer() error {
+	s, err := newServer()
+	if err != nil {
+		return err
+	}
+	s.bindHandlers()
+	if err := http.ListenAndServe(":9000", s.router); err != nil {
+		return err
+	}
+	return nil
 }
