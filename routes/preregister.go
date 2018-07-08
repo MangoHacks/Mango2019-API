@@ -34,6 +34,30 @@ func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 // GetPreregister handles a GET request to /preregister.
 func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// TODO: Make query to PostgresSQL to read preregistrations.
+	type Preregistrations []struct {
+		Email string `json:"email"`
+	}
 
+	rws, err := db.Query("SELECT * FROM preregistrations")
+	if err != nil {
+		sendJSONResponse(w, 400, []byte(err.Error()))
+		return
+	}
+
+	var prrs Preregistrations
+	for rws.Next() {
+		var eml string
+		rws.Scan(&eml)
+		prrs = append(prrs, struct {
+			Email string `json:"email"`
+		}{
+			Email: eml,
+		})
+	}
+	b, err := json.Marshal(prrs)
+	if err != nil {
+		sendJSONResponse(w, 400, []byte(err.Error()))
+		return
+	}
+	sendJSONResponse(w, 200, b)
 }
