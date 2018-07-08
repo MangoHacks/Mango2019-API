@@ -3,7 +3,9 @@
 # Mango2019-API
 
 This is the backend of 2019's MangoHacks, herein, all database functionality and most data manipulation
-events will occur. The API is built with scalability in mind and is able to be scaled horizontally with ease.
+events will occur.
+
+The API is built with scalability in mind and is able to be scaled horizontally with ease.
 
 ## Running/Testing The Server
 
