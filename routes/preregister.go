@@ -15,11 +15,11 @@ import (
 // PostPreregister handles a POST request to /preregister.
 func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// Mimic the request body.
-	type PreregisterRequest struct {
+	type preregisterRequest struct {
 		Email string `json:"email"`
 	}
 	// Declare a struct to fill with the request body.
-	var prr PreregisterRequest
+	var prr preregisterRequest
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
 		if err := web.SendHTTPResponse(w, web.BadRequestError); err != nil {
 			log.Fatal(err)
@@ -50,7 +50,7 @@ func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 // GetPreregister handles a GET request to /preregister.
 func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	type Preregistrations []struct {
+	type preregistrations []struct {
 		Email     string    `json:"email"`
 		Timestamp time.Time `json:"timestamp"`
 	}
@@ -66,7 +66,7 @@ func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	var prrs Preregistrations
+	var prrs preregistrations
 	for rws.Next() {
 		var eml string
 		var t time.Time
@@ -91,11 +91,11 @@ func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 // DeletePreregister deletes a row matching the email given in a request from the database.
 func DeletePreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	type PreregisterRequest struct {
+	type preregisterRequest struct {
 		Email string `json:"email"`
 	}
 
-	var prr PreregisterRequest
+	var prr preregisterRequest
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
 		if err := web.SendHTTPResponse(w, web.BadRequestError); err != nil {
 			log.Fatal(err)
