@@ -22,9 +22,15 @@
   ]
   revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
 
+[[projects]]
+  name = "github.com/rs/cors"
+  packages = ["."]
+  revision = "ca016a06a5753f8ba03029c0aa5e54afb1bf713f"
+  version = "v1.4.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7b5d93ac7c954090379eb36173f71f2082487f303333d1f5d2797473076cea04"
+  inputs-digest = "09cef766038f645b1181ed6dc2d79f87ca83fde63fb3ee99ccebf7c7e5d6b14e"
   solver-name = "gps-cdcl"
   solver-version = 1
