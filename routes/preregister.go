@@ -3,58 +3,115 @@ package routes
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
+	"strings"
+	"time"
+
+	"github.com/MangoHacks/Mango2019-API/web"
 )
 
 // PostPreregister handles a POST request to /preregister.
 func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	// Mimic the request body.
 	type PreregisterRequest struct {
 		Email string `json:"email"`
 	}
+	// Declare a struct to fill with the request body.
 	var prr PreregisterRequest
-
-	if err := readJSONBodyIntoStruct(r.Body, &prr); err != nil {
-		sendJSONResponse(w, 400, []byte(err.Error()))
+	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
+		if err := web.SendHTTPResponse(w, web.BadRequestError); err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 	eml := prr.Email
 
-	var e string
-	if err := db.QueryRow(`INSERT INTO preregistrations(email) 
-		VALUES($1) 
-		RETURNING email`, eml).Scan(&e); err != nil {
-		sendJSONResponse(w, 400, []byte(err.Error()))
+	// Insert into PostgresSQL
+	q := `INSERT INTO preregistrations(email, timestamp) 
+	VALUES($1, $2) 
+	RETURNING email`
+	if _, err := db.Exec(q, eml, time.Now()); err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			web.SendHTTPResponse(w, errors.New("user already exists"))
+		} else {
+			if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
+				log.Fatal(err)
+			}
+			log.Printf("encountered error while inserting into preregistrations: %s", err.Error())
+		}
 		return
 	}
-	sendJSONResponse(w, 200, []byte("OK"))
+	if err := web.SendHTTPResponse(w, "user successfully preregistered"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // GetPreregister handles a GET request to /preregister.
 func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	type Preregistrations []struct {
-		Email string `json:"email"`
+		Email     string    `json:"email"`
+		Timestamp time.Time `json:"timestamp"`
 	}
 
-	rws, err := db.Query("SELECT * FROM preregistrations")
+	q := `SELECT * FROM preregistrations
+		ORDER BY timestamp ASC`
+	rws, err := db.Query(q)
 	if err != nil {
-		sendJSONResponse(w, 400, []byte(err.Error()))
+		if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("encountered error while selecting from preregistrations: %s", err.Error())
 		return
 	}
 
 	var prrs Preregistrations
 	for rws.Next() {
 		var eml string
-		rws.Scan(&eml)
+		var t time.Time
+		rws.Scan(&eml, &t)
 		prrs = append(prrs, struct {
-			Email string `json:"email"`
+			Email     string    `json:"email"`
+			Timestamp time.Time `json:"timestamp"`
 		}{
-			Email: eml,
+			Email:     eml,
+			Timestamp: t,
 		})
 	}
 	b, err := json.Marshal(prrs)
 	if err != nil {
-		sendJSONResponse(w, 400, []byte(err.Error()))
+		log.Printf("encountered error while retrieving preregistrations: %s" + err.Error())
 		return
 	}
-	sendJSONResponse(w, 200, b)
+	if err := web.SendHTTPResponse(w, b); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// DeletePreregister deletes a row matching the email given in a request from the database.
+func DeletePreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	type PreregisterRequest struct {
+		Email string `json:"email"`
+	}
+
+	var prr PreregisterRequest
+	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
+		if err := web.SendHTTPResponse(w, web.BadRequestError); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+	eml := prr.Email
+	q := `DELETE FROM preregistrations
+	WHERE email = $1`
+	if _, err := db.Exec(q, eml); err != nil {
+		if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+	if err := web.SendHTTPResponse(w, "OK"); err != nil {
+		log.Fatal(err)
+	}
 }

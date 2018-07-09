@@ -6,6 +6,7 @@ import (
 
 	"github.com/MangoHacks/Mango2019-API/database"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 // server represents an instance of the server and all the dependencies required across it.
@@ -40,7 +41,11 @@ func StartServer() error {
 		return err
 	}
 	s.bindHandlers()
-	if err := http.ListenAndServe(":9000", s.router); err != nil {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "OPTIONS", "DELETE"},
+	})
+	if err := http.ListenAndServe(":9000", c.Handler(s.router)); err != nil {
 		return err
 	}
 	return nil

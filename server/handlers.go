@@ -14,6 +14,8 @@ func handlePreregister(db *sql.DB) http.HandlerFunc {
 			routes.PostPreregister(w, r, db)
 		} else if r.Method == "GET" {
 			routes.GetPreregister(w, r, db)
+		} else if r.Method == "DELETE" {
+			routes.DeletePreregister(w, r, db)
 		}
 	}
 }
