@@ -20,8 +20,8 @@ curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.7.
     chmod +x kubectl && sudo mv kubectl /usr/local/bin/
 
 # Push to Docker registry.
-gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/MangoHacks2019-API:v1
+gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${COMMIT}
 
 # Run on Kubernetes.
-kubectl run MangoHacks2019-API --image=${HOST_NAME}/${PROJECT_ID}/MangoHacks2019-API:v1 --port 9000
+kubectl run mangohacks2019-api --image=${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${BRANCH}-${COMMIT} --port 9000
 kubectl expose deployment hello-web --type=LoadBalancer --port 80 --target-port 9000

@@ -1,15 +1,22 @@
 sudo: required
 
+services:
+  - docker
+
 language: go
-go:
-  - master
 
 cache:
   directories:
     - "$HOME/google-cloud-sdk/"
-    
+
+script: 
+  - chmod +x script/build.sh
+  - script/build.sh
+
 deploy:
   provider: script
-  script: scripts/deploy.sh
+  script: 
+    - chmod +x script/deploy.sh
+    - script/deploy.sh
   on:
     branch: master
