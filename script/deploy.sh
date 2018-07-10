@@ -24,4 +24,4 @@ gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${COMMIT}
 
 # Run on Kubernetes.
 kubectl run mangohacks2019-api --image=${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${BRANCH}-${COMMIT} --port 9000
-kubectl expose deployment hello-web --type=LoadBalancer --port 80 --target-port 9000
+kubectl expose deployment mangohacks2019-api --type=LoadBalancer --port 80 --target-port 9000
