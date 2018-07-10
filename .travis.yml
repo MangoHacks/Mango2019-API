@@ -4,26 +4,12 @@ language: go
 go:
   - master
 
-services:
-  - docker
-
-before_install:
-  - openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in client-secret.json.enc -out client-secret.json -d
-  # If the SDK is not already cached, download it and unpack it
-  - if [ ! -d ${HOME}/google-cloud-sdk ]; then
-      curl https://sdk.cloud.google.com | bash;
-    fi
-  - tar -xzf credentials.tar.gz
-  - mkdir -p lib
-  # Here we use the decrypted service account credentials to authenticate the command line tool
-  - gcloud auth activate-service-account --key-file client-secret.json
-
-before_script:
-  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl && \
-    chmod +x kubectl && sudo mv kubectl /usr/local/bin/
-
-script:
-  - gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/MangoHacks2019-API:v1
-  - kubectl run MangoHacks2019-API --image=${HOST_NAME}/${PROJECT_ID}/MangoHacks2019-API:v1 --port 9000
-  - kubectl expose deployment hello-web --type=LoadBalancer --port 80 --target-port 9000
-  
+cache:
+  directories:
+    - "$HOME/google-cloud-sdk/"
+    
+deploy:
+  provider: script
+  script: scripts/deploy.sh
+  on:
+    branch: master
