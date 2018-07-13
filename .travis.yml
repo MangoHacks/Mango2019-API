@@ -10,13 +10,13 @@ cache:
     - "$HOME/google-cloud-sdk/"
 
 script: 
+  - echo $HOME
   - chmod +x script/build.sh
   - script/build.sh
 
 deploy:
   provider: script
-  script: 
-    - chmod +x script/deploy.sh
-    - script/deploy.sh
+  script: bash script/deploy.sh
   on:
     branch: master
+  skip_cleanup: true
