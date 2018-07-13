@@ -4,8 +4,9 @@ export COMMIT=${TRAVIS_COMMIT::8}
 export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 
-# Decrypt our keys
-openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in client-secret.json.enc -out client-secret.json -d
+# Decrypt and untar our keys
+openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in secrets.tar.enc -out secrets.tar -d
+tar xvf secrets.tar
 
 # If the SDK is not already cached, download it and unpack it.
 gcloud version || true
@@ -24,8 +25,7 @@ gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${BRANCH}-${COMMI
 # Install Kubernetes.
 gcloud components install kubectl
 
-# Decrypt and set Kubeconfig
-openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in config.enc -out config -d
+# Move kubeconfig
 mkdir $HOME/.kube
 mv config $HOME/.kube/config
 
