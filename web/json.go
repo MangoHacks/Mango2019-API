@@ -1,5 +1,3 @@
-// Package web contains many functions and structs that are common
-// to applications and services that interact via the internet.
 package web
 
 import (
@@ -9,7 +7,7 @@ import (
 	"log"
 )
 
-// ReadJSONBodyIntoStruct will take the given JSON ReadCloser and read it into a matching, given struct.
+// ReadJSONBodyIntoStruct will take the given io.ReadCloser of a JSON and read it into a matching, given struct.
 func ReadJSONBodyIntoStruct(body io.ReadCloser, v interface{}) *HTTPError {
 	defer body.Close()
 	b, err := ioutil.ReadAll(body)

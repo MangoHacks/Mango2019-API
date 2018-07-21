@@ -11,11 +11,29 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// New constructs a new database connection.
+// Database credentials
+//
+// These are the credentials necessary to initialize a
+// connection with th database.
+var (
+	// DBUser is the username for the database.
+	DBUser string
+
+	// DBPassword is the password for the database.
+	DBPassword string
+
+	// DBName is the name of the database.
+	DBName string
+)
+
+// New returns a new connection to the specified database.
+//
+// The credentials for the database are exepected to be exported and
+// will be pulled down from the environment.
 func New() (*sql.DB, error) {
-	DBUser := os.Getenv("DB_USER")
-	DBPassword := os.Getenv("DB_PASSWORD")
-	DBName := os.Getenv("DB_NAME")
+	DBUser = os.Getenv("DB_USER")
+	DBPassword = os.Getenv("DB_PASSWORD")
+	DBName = os.Getenv("DB_NAME")
 
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
 		DBUser, DBPassword, DBName)

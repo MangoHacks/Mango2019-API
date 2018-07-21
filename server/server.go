@@ -37,12 +37,12 @@ func New() (*Server, error) {
 // This allows the web service to listen to and handle requests made to these
 // resources.
 func (s *Server) bindHandlers() {
-	s.router.HandleFunc("/preregister", handlePreregister(s.db))
-	s.router.HandleFunc("/register", handleRegister(s.db))
+	s.router.HandleFunc("/preregistration", handlePreregistration(s.db))
+	s.router.HandleFunc("/registration", handleRegistration(s.db))
 }
 
-// StartServer starts a new server.
-func (s *Server) StartServer() error {
+// Start starts a server.
+func (s *Server) Start() error {
 	s.bindHandlers()
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},

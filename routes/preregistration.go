@@ -1,3 +1,5 @@
+// Package routes deals with the execution of requests
+// to different routes.
 package routes
 
 import (
@@ -12,8 +14,14 @@ import (
 	"github.com/MangoHacks/Mango2019-API/web"
 )
 
-// PostPreregister handles a POST request to /preregister.
-func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+// PostPreregistration handles a POST request to /preregistration.
+// We add the email received in the JSON body as a row in the database.
+//
+// We expect a JSON object in the request body, of form:
+//  {
+//  	"email": "example@google.com"
+//  }
+func PostPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// Mimic the request body.
 	type preregisterRequest struct {
 		Email string `json:"email"`
@@ -48,8 +56,20 @@ func PostPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 }
 
-// GetPreregister handles a GET request to /preregister.
-func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+// GetPreregistration handles a GET request to /preregistration.
+// We retrieve the emails of every user to have preregistered from
+// database.
+//
+// We send a JSON body in the response, of form:
+//  [
+//  	{
+//  		"email" "example1@google.com"
+//  	},
+//  	{
+//  		"email": "example2@google.com"
+//  	}
+//  ]
+func GetPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	type preregistrations []struct {
 		Email     string    `json:"email"`
 		Timestamp time.Time `json:"timestamp"`
@@ -89,8 +109,15 @@ func GetPreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 }
 
-// DeletePreregister deletes a row matching the email given in a request from the database.
-func DeletePreregister(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+// DeletePreregistration handles a DELETE request to /preregistration.
+// We delete the row containing the email received in the JSON body from the
+// database.
+//
+// We expect a JSON object in the request body, of form:
+//  {
+//  	"email": "example@google.com"
+//  }
+func DeletePreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	type preregisterRequest struct {
 		Email string `json:"email"`
 	}
