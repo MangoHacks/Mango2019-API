@@ -1,3 +1,5 @@
+// Package web contains many functions and structs that are common
+// to applications and services that interact via the internet.
 package web
 
 import (

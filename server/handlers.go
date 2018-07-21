@@ -1,8 +1,12 @@
+// Package server deals with the initialization of the server as
+// well as the listening and handling of resources.
 package server
 
 import (
 	"database/sql"
 	"net/http"
+
+	"github.com/MangoHacks/Mango2019-API/web"
 
 	"github.com/MangoHacks/Mango2019-API/routes"
 )
@@ -16,6 +20,8 @@ func handlePreregister(db *sql.DB) http.HandlerFunc {
 			routes.GetPreregister(w, r, db)
 		} else if r.Method == "DELETE" {
 			routes.DeletePreregister(w, r, db)
+		} else {
+			web.SendHTTPResponse(w, web.MethodNotAllowedError)
 		}
 	}
 }
@@ -27,6 +33,8 @@ func handleRegister(db *sql.DB) http.HandlerFunc {
 			routes.PostRegister(w, r, db)
 		} else if r.Method == "GET" {
 			routes.GetRegister(w, r, db)
+		} else {
+			web.SendHTTPResponse(w, web.MethodNotAllowedError)
 		}
 	}
 }

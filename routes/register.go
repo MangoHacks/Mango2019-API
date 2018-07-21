@@ -1,3 +1,5 @@
+// Package routes deals with the execution of requests
+// to different routes.
 package routes
 
 import (

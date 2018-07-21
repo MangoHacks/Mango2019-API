@@ -14,29 +14,60 @@ import (
 // It's useful to provide the user with these errors so they can know
 // when they've messed up (or when you have).
 var (
-	// 4xx Client Errors
+	///////////////////////////////////////////////
+	// 4XX Client Errors
 	// These are for when the client does something
 	// incorrect.
+	///////////////////////////////////////////////
+
+	// BadRequestError means that the server
+	// could not understand the request due to invalid syntax.
 	BadRequestError = HTTPError{
 		err:        "Bad Request",
 		statusCode: 400,
 	}
+
+	// ForbiddenError means that the client does not
+	// have access rights to the content
+	//
+	// eg: Pepito Pirindingo tries to DELETE all of our
+	// users, but know damn well that Pepito isn't an admin!
 	ForbiddenError = HTTPError{
 		err:        "Forbidden",
 		statusCode: 403,
 	}
+
+	// NotFoundError means that the server cannot find the requested
+	// resource.
+	//
+	// eg: https://mangohacks.com/potatoes will return a 404 because this
+	// is MangoHacks, not PotatoHacks!
 	NotFoundError = HTTPError{
 		err:        "Not Found",
 		statusCode: 404,
 	}
+
+	// MethodNotAllowed means that the request method is known by the
+	// server but has been disabled and cannot be used.
+	//
+	// eg: We don't need a PUT for /preregistration, because there's only
+	// one field!
 	MethodNotAllowedError = HTTPError{
 		err:        "Method Not Allowed",
 		statusCode: 405,
 	}
 
-	// 5xx Server Errors
+	///////////////////////////////////////////////
+	// 5XX Server Errors
 	// These are for when the server does something
 	// incorrect.
+	///////////////////////////////////////////////
+
+	// InternalServerError means that he server has encountered a
+	// situation it doesn't know how to handle.
+	//
+	// eg: We accidentally dereference a nil pointer and
+	// all our code blows up!
 	InternalServerError = HTTPError{
 		err:        "Internal Server Error",
 		statusCode: 500,

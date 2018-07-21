@@ -1,3 +1,5 @@
+// Package server deals with the initialization of the server as
+// well as the listening and handling of resources.
 package server
 
 import (

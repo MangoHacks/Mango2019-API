@@ -1,3 +1,5 @@
+// Package database deals with the initialization
+// of our database connection.
 package database
 
 import (
