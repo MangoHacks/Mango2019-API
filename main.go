@@ -1,3 +1,5 @@
+// Package main initializes and runs the server.
+// This package is small, because it is main.
 package main
 
 import (
@@ -7,7 +9,11 @@ import (
 )
 
 func main() {
-	if err := server.StartServer(); err != nil {
+	s, err := server.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := s.StartServer(); err != nil {
 		log.Fatal(err)
 	}
 }

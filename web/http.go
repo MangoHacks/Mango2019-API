@@ -1,14 +1,22 @@
+// Package web contains many functions and structs that are common
+// to applications and services that interact via the internet.
 package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"strconv"
 )
 
-// HTTPError types
+// HTTPErrors
+//
+// These which arise from HTTP requests and responses.
+// It's useful to provide the user with these errors so they can know
+// when they've messed up (or when you have).
 var (
 	// 4xx Client Errors
+	// These are for when the client does something
+	// incorrect.
 	BadRequestError = HTTPError{
 		err:        "Bad Request",
 		statusCode: 400,
@@ -27,6 +35,8 @@ var (
 	}
 
 	// 5xx Server Errors
+	// These are for when the server does something
+	// incorrect.
 	InternalServerError = HTTPError{
 		err:        "Internal Server Error",
 		statusCode: 500,
@@ -39,13 +49,9 @@ type HTTPError struct {
 	statusCode int
 }
 
-func (e *HTTPError) getStatusCode() int {
-	return e.statusCode
-}
-
 // Error returns a string representation of the error.
 func (e *HTTPError) Error() string {
-	return strconv.Itoa(e.statusCode) + " " + e.err
+	return fmt.Sprintf("%d %s", e.statusCode, e.err)
 }
 
 // JSONResponse represents a JSON response to send back to the client.
@@ -55,9 +61,19 @@ type JSONResponse struct {
 }
 
 // SendHTTPResponse sends back a response to the client.
+// It exhibits some polymorphism, depending on the type of interface{}
+// provided, it sends an appropriate response to the user.
+//
+// The response it sends to the user follows a specific JSON pattern:
+//  {
+//  	"success": true/false,
+//		"message": "message"
+//  }
 func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 	var rsp JSONResponse
 	switch v.(type) {
+	// case string provides shorthand for sending an OK response with
+	// a custom message.
 	case string:
 		if s, ok := v.(string); ok {
 			w.WriteHeader(200)
@@ -68,7 +84,7 @@ func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 		}
 	case HTTPError:
 		if e, ok := v.(HTTPError); ok {
-			w.WriteHeader(e.getStatusCode())
+			w.WriteHeader(e.statusCode)
 			rsp = JSONResponse{
 				Success: false,
 				Message: e.Error(),
@@ -86,10 +102,10 @@ func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 		if j, ok := v.([]byte); ok {
 			w.WriteHeader(200)
 			w.Write(j)
-			return nil
 		}
+		return nil
 	default:
-		w.WriteHeader(InternalServerError.getStatusCode())
+		w.WriteHeader(InternalServerError.statusCode)
 		rsp = JSONResponse{
 			Success: false,
 			Message: InternalServerError.Error(),
