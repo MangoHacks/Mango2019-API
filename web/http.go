@@ -98,7 +98,7 @@ type JSONResponse struct {
 // The response it sends to the user follows a specific JSON pattern:
 //  {
 //  	"success": true/false,
-//		"message": "message"
+//  	"message": "message"
 //  }
 func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 	var rsp JSONResponse
