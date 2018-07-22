@@ -22,6 +22,8 @@ var (
 
 	// BadRequestError means that the server
 	// could not understand the request due to invalid syntax.
+	//
+	// eg: Someone drops a comma in the JSON payload.
 	BadRequestError = HTTPError{
 		err:        "Bad Request",
 		statusCode: 400,
@@ -31,7 +33,7 @@ var (
 	// have access rights to the content
 	//
 	// eg: Pepito Pirindingo tries to DELETE all of our
-	// users, but know damn well that Pepito isn't an admin!
+	// users, but we know damn well that Pepito isn't an admin!
 	ForbiddenError = HTTPError{
 		err:        "Forbidden",
 		statusCode: 403,
@@ -100,6 +102,23 @@ type JSONResponse struct {
 //  	"success": true/false,
 //  	"message": "message"
 //  }
+//
+// eg:
+//  if err := web.SendHTTPResponse(w, web.NotFoundError); err != nil {
+//  	// TODO: Handle error.
+//  }
+// or
+//  if err := web.SendHTTPResponse(w, "Looks good to me."); err != nil {
+//  	// TODO: Handle error.
+//  }
+// or
+//  if err := web.SendHTTPResponse(w, []byte(`
+//  	{
+//  		"foo": "bar"
+//  	}
+//  `)); err != nil {
+//  	// TODO: Handle error.
+//  }
 func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 	var rsp JSONResponse
 	switch v.(type) {
@@ -113,16 +132,14 @@ func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 				Message: s,
 			}
 		}
-	case HTTPError:
+	case error:
 		if e, ok := v.(HTTPError); ok {
 			w.WriteHeader(e.statusCode)
 			rsp = JSONResponse{
 				Success: false,
 				Message: e.Error(),
 			}
-		}
-	case error:
-		if e, ok := v.(error); ok {
+		} else if e, ok := v.(error); ok {
 			w.WriteHeader(400)
 			rsp = JSONResponse{
 				Success: false,
