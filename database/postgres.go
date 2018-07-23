@@ -11,17 +11,20 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Database credentials
+// Database Credentials
 //
 // These are the credentials necessary to initialize a
-// connection with th database.
+// connection with the database.
 var (
+	//////////////////////////////////
+	// PostgreSQL Database Credentials
+	//////////////////////////////////
 	DBUser     = os.Getenv("DB_USER")
 	DBPassword = os.Getenv("DB_PASSWORD")
 	DBName     = os.Getenv("DB_NAME")
 )
 
-// New returns a new connection to the specified database.
+// New returns a new connection to the specified PostgreSQL database.
 //
 // The credentials for the database are exepected to be exported and
 // will be pulled down from the environment.

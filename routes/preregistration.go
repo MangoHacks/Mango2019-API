@@ -5,12 +5,11 @@ package routes
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
+	"github.com/MangoHacks/Mango2019-API/database"
 	"github.com/MangoHacks/Mango2019-API/web"
 )
 
@@ -21,7 +20,7 @@ import (
 //  {
 //  	"email": "example@google.com"
 //  }
-func PostPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func PostPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 	// Mimic the request body.
 	type preregisterRequest struct {
 		Email string `json:"email"`
@@ -36,20 +35,13 @@ func PostPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	eml := prr.Email
 
-	// Insert into PostgresSQL
-	q := `INSERT INTO preregistrations(email, timestamp) 
-	VALUES($1, $2) 
-	RETURNING email`
-	if _, err := db.Exec(q, eml, time.Now()); err != nil {
-		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			web.SendHTTPResponse(w, errors.New("user already exists"))
-		} else {
-			if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
-				log.Fatal(err)
-			}
-			log.Printf("encountered error while inserting into preregistrations: %s", err.Error())
+	if err := db.InsertPreregistration(eml); err != nil {
+		if err != database.ErrDuplicate {
+			err = &web.InternalServerError
 		}
-		return
+		if err := web.SendHTTPResponse(w, err); err != nil {
+			log.Fatal(err)
+		}
 	}
 	if err := web.SendHTTPResponse(w, "user successfully preregistered"); err != nil {
 		log.Fatal(err)
