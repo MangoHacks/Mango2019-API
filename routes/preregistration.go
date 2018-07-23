@@ -33,9 +33,8 @@ func PostPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB
 		}
 		return
 	}
-	eml := prr.Email
 
-	if err := db.InsertPreregistration(eml); err != nil {
+	if err := db.InsertPreregistration(prr.Email); err != nil {
 		if err != database.ErrDuplicate {
 			err = &web.InternalServerError
 		}
