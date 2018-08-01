@@ -48,8 +48,5 @@ func (s *Server) Start() error {
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "OPTIONS", "DELETE"},
 	})
-	if err := http.ListenAndServe(":9000", c.Handler(s.router)); err != nil {
-		return err
-	}
-	return nil
+	return http.ListenAndServe(":9000", c.Handler(s.router))
 }
