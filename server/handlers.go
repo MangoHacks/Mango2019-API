@@ -19,7 +19,7 @@ func handlePreregistration(db *database.DB) http.HandlerFunc {
 		} else if r.Method == "DELETE" {
 			routes.DeletePreregistration(w, r, db)
 		} else {
-			web.SendHTTPResponse(w, web.MethodNotAllowedError)
+			web.SendHTTPResponse(w, web.ErrMethodNotAllowed)
 		}
 	}
 }
@@ -34,7 +34,7 @@ func handleRegistration(db *database.DB) http.HandlerFunc {
 		} else if r.Method == "DELETE" {
 			routes.DeleteRegistration(w, r, db)
 		} else {
-			web.SendHTTPResponse(w, web.MethodNotAllowedError)
+			web.SendHTTPResponse(w, web.ErrMethodNotAllowed)
 		}
 	}
 }

@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"database/sql"
 	"net/http"
+
+	"github.com/MangoHacks/Mango2019-API/database"
 )
 
 // PostRegistration handles a POST to /registration.
@@ -13,7 +14,7 @@ import (
 //  	"email": "example@google.com",
 //  	"...": "..."
 //  }
-func PostRegistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func PostRegistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 
 }
 
@@ -32,7 +33,7 @@ func PostRegistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 //  	}
 //  ]
 //
-func GetRegistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetRegistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 
 }
 
@@ -44,6 +45,6 @@ func GetRegistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 //  {
 //  	"email": "example@google.com"
 //  }
-func DeleteRegistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func DeleteRegistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 
 }
