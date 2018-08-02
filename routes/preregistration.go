@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/MangoHacks/Mango2019-API/database"
+	"github.com/MangoHacks/Mango2019-API/models"
 	"github.com/MangoHacks/Mango2019-API/web"
 )
 
@@ -19,12 +20,7 @@ import (
 //  	"email": "example@google.com"
 //  }
 func PostPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
-	// Mimic the request body.
-	type preregisterRequest struct {
-		Email string `json:"email"`
-	}
-	// Declare a struct to fill with the request body.
-	var prr preregisterRequest
+	var prr models.Preregistration
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
 		web.SendHTTPResponse(w, web.ErrBadRequest)
 		return
@@ -76,11 +72,7 @@ func GetPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB)
 //  	"email": "example@google.com"
 //  }
 func DeletePreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
-	type preregisterRequest struct {
-		Email string `json:"email"`
-	}
-
-	var prr preregisterRequest
+	var prr models.Preregistration
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
 		web.SendHTTPResponse(w, web.ErrBadRequest)
 		log.Printf("encountered error parsing delete request into struct: %v", err)
