@@ -5,6 +5,7 @@ package web
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -22,7 +23,9 @@ var (
 
 	// BadRequestError means that the server
 	// could not understand the request due to invalid syntax.
-	BadRequestError = HTTPError{
+	//
+	// eg: Someone drops a comma in the JSON payload.
+	ErrBadRequest = HTTPError{
 		err:        "Bad Request",
 		statusCode: 400,
 	}
@@ -31,8 +34,8 @@ var (
 	// have access rights to the content
 	//
 	// eg: Pepito Pirindingo tries to DELETE all of our
-	// users, but know damn well that Pepito isn't an admin!
-	ForbiddenError = HTTPError{
+	// users, but we know damn well that Pepito isn't an admin!
+	ErrForbidden = HTTPError{
 		err:        "Forbidden",
 		statusCode: 403,
 	}
@@ -42,7 +45,7 @@ var (
 	//
 	// eg: https://mangohacks.com/potatoes will return a 404 because this
 	// is MangoHacks, not PotatoHacks!
-	NotFoundError = HTTPError{
+	ErrNotFound = HTTPError{
 		err:        "Not Found",
 		statusCode: 404,
 	}
@@ -52,7 +55,7 @@ var (
 	//
 	// eg: We don't need a PUT for /preregistration, because there's only
 	// one field!
-	MethodNotAllowedError = HTTPError{
+	ErrMethodNotAllowed = HTTPError{
 		err:        "Method Not Allowed",
 		statusCode: 405,
 	}
@@ -68,7 +71,7 @@ var (
 	//
 	// eg: We accidentally dereference a nil pointer and
 	// all our code blows up!
-	InternalServerError = HTTPError{
+	ErrInternalServer = HTTPError{
 		err:        "Internal Server Error",
 		statusCode: 500,
 	}
@@ -100,7 +103,24 @@ type JSONResponse struct {
 //  	"success": true/false,
 //  	"message": "message"
 //  }
-func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
+//
+// eg:
+//  if err := web.SendHTTPResponse(w, web.NotFoundError); err != nil {
+//  	// TODO: Handle error.
+//  }
+// or
+//  if err := web.SendHTTPResponse(w, "Looks good to me."); err != nil {
+//  	// TODO: Handle error.
+//  }
+// or
+//  if err := web.SendHTTPResponse(w, []byte(`
+//  	{
+//  		"foo": "bar"
+//  	}
+//  `)); err != nil {
+//  	// TODO: Handle error.
+//  }
+func SendHTTPResponse(w http.ResponseWriter, v interface{}) {
 	var rsp JSONResponse
 	switch v.(type) {
 	// case string provides shorthand for sending an OK response with
@@ -113,16 +133,14 @@ func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 				Message: s,
 			}
 		}
-	case HTTPError:
+	case error:
 		if e, ok := v.(HTTPError); ok {
 			w.WriteHeader(e.statusCode)
 			rsp = JSONResponse{
 				Success: false,
 				Message: e.Error(),
 			}
-		}
-	case error:
-		if e, ok := v.(error); ok {
+		} else if e, ok := v.(error); ok {
 			w.WriteHeader(400)
 			rsp = JSONResponse{
 				Success: false,
@@ -134,19 +152,18 @@ func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 			w.WriteHeader(200)
 			w.Write(j)
 		}
-		return nil
+		return
 	default:
-		w.WriteHeader(InternalServerError.statusCode)
+		w.WriteHeader(ErrInternalServer.statusCode)
 		rsp = JSONResponse{
 			Success: false,
-			Message: InternalServerError.Error(),
+			Message: ErrInternalServer.Error(),
 		}
 	}
 	b, err := json.Marshal(rsp)
 	if err != nil {
-		SendHTTPResponse(w, InternalServerError)
-		return err
+		SendHTTPResponse(w, ErrInternalServer)
+		log.Fatal(err)
 	}
 	w.Write(b)
-	return nil
 }

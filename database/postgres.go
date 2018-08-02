@@ -3,43 +3,73 @@
 package database
 
 import (
-	"database/sql"
-	"fmt"
-	"os"
+	"strings"
+	"time"
+
+	"github.com/MangoHacks/Mango2019-API/models"
 
 	// To avoid using pq directly.
 	_ "github.com/lib/pq"
 )
 
-// Database credentials
-//
-// These are the credentials necessary to initialize a
-// connection with th database.
+// PostgreSQL Queries
 var (
-	// DBUser is the username for the database.
-	DBUser string
+	// PostgresInsertPreregistrationQuery is the query used to insert into the
+	// preregistrations table.
+	PostgresInsertPreregistrationQuery = `
+		INSERT 
+		INTO preregistrations(email, timestamp) 
+		VALUES($1, $2) 
+		RETURNING email
+	`
 
-	// DBPassword is the password for the database.
-	DBPassword string
+	// PostgresSelectPreregistrationsQuery is the query used to select all preregistrations
+	// from the preregistrations table.
+	PostgresSelectPreregistrationsQuery = `
+		SELECT * 
+		FROM preregistrations
+		ORDER BY timestamp ASC
+	`
 
-	// DBName is the name of the database.
-	DBName string
+	// PostgresDeletePreregistrationQuery is the query used to delete a preregistration
+	// from the preregistrations table.
+	PostgresDeletePreregistrationQuery = `
+		DELETE 
+		FROM preregistrations
+		WHERE email = $1
+	`
 )
 
-// New returns a new connection to the specified database.
-//
-// The credentials for the database are exepected to be exported and
-// will be pulled down from the environment.
-func New() (*sql.DB, error) {
-	DBUser = os.Getenv("DB_USER")
-	DBPassword = os.Getenv("DB_PASSWORD")
-	DBName = os.Getenv("DB_NAME")
+func (db *DB) postgresInsertPreregistrations(email string) error {
+	if _, err := db.postgres.Exec(PostgresInsertPreregistrationQuery, email, time.Now()); err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return ErrDuplicate
+		}
+		return err
+	}
+	return nil
+}
 
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		DBUser, DBPassword, DBName)
-	db, err := sql.Open("postgres", dbinfo)
+func (db *DB) postgresSelectPreregistrations() ([]models.Preregistration, error) {
+	rws, err := db.postgres.Query(PostgresSelectPreregistrationsQuery)
 	if err != nil {
 		return nil, err
 	}
-	return db, nil
+
+	var prrs []models.Preregistration
+	for rws.Next() {
+		var eml string
+		var t time.Time
+		rws.Scan(&eml, &t)
+		prrs = append(prrs, models.Preregistration{
+			Email:     eml,
+			Timestamp: t,
+		})
+	}
+	return prrs, nil
+}
+
+func (db *DB) postgresDeletePreregistration(email string) error {
+	_, err := db.postgres.Exec(PostgresDeletePreregistrationQuery, email)
+	return err
 }

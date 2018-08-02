@@ -3,7 +3,6 @@
 package server
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/MangoHacks/Mango2019-API/database"
@@ -14,7 +13,7 @@ import (
 // Server represents an instance of the server and all the dependencies required across it.
 type Server struct {
 	router *mux.Router
-	db     *sql.DB
+	db     *database.DB
 }
 
 // New constructs a new server.
@@ -23,7 +22,7 @@ type Server struct {
 // and an sql.DB pointer
 func New() (*Server, error) {
 	r := mux.NewRouter()
-	db, err := database.New()
+	db, err := database.New("postgres")
 	if err != nil {
 		return nil, err
 	}

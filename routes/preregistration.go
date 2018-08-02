@@ -3,14 +3,12 @@
 package routes
 
 import (
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
-	"strings"
-	"time"
 
+	"github.com/MangoHacks/Mango2019-API/database"
+	"github.com/MangoHacks/Mango2019-API/models"
 	"github.com/MangoHacks/Mango2019-API/web"
 )
 
@@ -21,39 +19,21 @@ import (
 //  {
 //  	"email": "example@google.com"
 //  }
-func PostPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	// Mimic the request body.
-	type preregisterRequest struct {
-		Email string `json:"email"`
-	}
-	// Declare a struct to fill with the request body.
-	var prr preregisterRequest
+func PostPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
+	var prr models.Preregistration
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
-		if err := web.SendHTTPResponse(w, web.BadRequestError); err != nil {
-			log.Fatal(err)
-		}
+		web.SendHTTPResponse(w, web.ErrBadRequest)
 		return
 	}
-	eml := prr.Email
 
-	// Insert into PostgresSQL
-	q := `INSERT INTO preregistrations(email, timestamp) 
-	VALUES($1, $2) 
-	RETURNING email`
-	if _, err := db.Exec(q, eml, time.Now()); err != nil {
-		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			web.SendHTTPResponse(w, errors.New("user already exists"))
-		} else {
-			if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
-				log.Fatal(err)
-			}
-			log.Printf("encountered error while inserting into preregistrations: %s", err.Error())
+	if err := db.InsertPreregistration(prr.Email); err != nil {
+		if err != database.ErrDuplicate {
+			err = &web.ErrInternalServer
 		}
+		web.SendHTTPResponse(w, err)
 		return
 	}
-	if err := web.SendHTTPResponse(w, "user successfully preregistered"); err != nil {
-		log.Fatal(err)
-	}
+	web.SendHTTPResponse(w, "user successfully preregistered")
 }
 
 // GetPreregistration handles a GET request to /preregistration.
@@ -69,44 +49,18 @@ func PostPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 //  		"email": "example2@google.com"
 //  	}
 //  ]
-func GetPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	type preregistrations []struct {
-		Email     string    `json:"email"`
-		Timestamp time.Time `json:"timestamp"`
-	}
-
-	q := `SELECT * FROM preregistrations
-		ORDER BY timestamp ASC`
-	rws, err := db.Query(q)
+func GetPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
+	prrs, err := db.SelectPreregistrations()
 	if err != nil {
-		if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("encountered error while selecting from preregistrations: %s", err.Error())
-		return
-	}
-
-	var prrs preregistrations
-	for rws.Next() {
-		var eml string
-		var t time.Time
-		rws.Scan(&eml, &t)
-		prrs = append(prrs, struct {
-			Email     string    `json:"email"`
-			Timestamp time.Time `json:"timestamp"`
-		}{
-			Email:     eml,
-			Timestamp: t,
-		})
+		web.SendHTTPResponse(w, web.ErrInternalServer)
+		log.Printf("encountered error while retrieving preregistrations: %s" + err.Error())
 	}
 	b, err := json.Marshal(prrs)
 	if err != nil {
-		log.Printf("encountered error while retrieving preregistrations: %s" + err.Error())
+		log.Printf("encountered error while marshalling preregistrations: %s" + err.Error())
 		return
 	}
-	if err := web.SendHTTPResponse(w, b); err != nil {
-		log.Fatal(err)
-	}
+	web.SendHTTPResponse(w, b)
 }
 
 // DeletePreregistration handles a DELETE request to /preregistration.
@@ -117,28 +71,16 @@ func GetPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 //  {
 //  	"email": "example@google.com"
 //  }
-func DeletePreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	type preregisterRequest struct {
-		Email string `json:"email"`
-	}
-
-	var prr preregisterRequest
+func DeletePreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
+	var prr models.Preregistration
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
-		if err := web.SendHTTPResponse(w, web.BadRequestError); err != nil {
-			log.Fatal(err)
-		}
+		web.SendHTTPResponse(w, web.ErrBadRequest)
+		log.Printf("encountered error parsing delete request into struct: %v", err)
 		return
 	}
-	eml := prr.Email
-	q := `DELETE FROM preregistrations
-	WHERE email = $1`
-	if _, err := db.Exec(q, eml); err != nil {
-		if err := web.SendHTTPResponse(w, web.InternalServerError); err != nil {
-			log.Fatal(err)
-		}
+	if err := db.DeletePreregistration(prr.Email); err != nil {
+		web.SendHTTPResponse(w, web.ErrInternalServer)
 		return
 	}
-	if err := web.SendHTTPResponse(w, "OK"); err != nil {
-		log.Fatal(err)
-	}
+	web.SendHTTPResponse(w, "OK")
 }
