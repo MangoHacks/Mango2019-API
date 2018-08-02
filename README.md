@@ -9,6 +9,8 @@ events will occur.
 
 The API is built with scalability in mind and is able to be scaled horizontally with ease.
 
+*Shoutout to [Google](https://google.com/) for letting us deploy on Google Cloud Kubernetes Engine, allowing us to build ridiculously resilient software. Love you guys!*
+
 ## Running/Testing The Server
 
 1.  `$ git clone` the repository into your `$GOPATH`.
