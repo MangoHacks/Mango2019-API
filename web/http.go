@@ -5,6 +5,7 @@ package web
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -24,7 +25,7 @@ var (
 	// could not understand the request due to invalid syntax.
 	//
 	// eg: Someone drops a comma in the JSON payload.
-	BadRequestError = HTTPError{
+	ErrBadRequest = HTTPError{
 		err:        "Bad Request",
 		statusCode: 400,
 	}
@@ -34,7 +35,7 @@ var (
 	//
 	// eg: Pepito Pirindingo tries to DELETE all of our
 	// users, but we know damn well that Pepito isn't an admin!
-	ForbiddenError = HTTPError{
+	ErrForbidden = HTTPError{
 		err:        "Forbidden",
 		statusCode: 403,
 	}
@@ -44,7 +45,7 @@ var (
 	//
 	// eg: https://mangohacks.com/potatoes will return a 404 because this
 	// is MangoHacks, not PotatoHacks!
-	NotFoundError = HTTPError{
+	ErrNotFound = HTTPError{
 		err:        "Not Found",
 		statusCode: 404,
 	}
@@ -54,7 +55,7 @@ var (
 	//
 	// eg: We don't need a PUT for /preregistration, because there's only
 	// one field!
-	MethodNotAllowedError = HTTPError{
+	ErrMethodNotAllowed = HTTPError{
 		err:        "Method Not Allowed",
 		statusCode: 405,
 	}
@@ -70,7 +71,7 @@ var (
 	//
 	// eg: We accidentally dereference a nil pointer and
 	// all our code blows up!
-	InternalServerError = HTTPError{
+	ErrInternalServer = HTTPError{
 		err:        "Internal Server Error",
 		statusCode: 500,
 	}
@@ -119,7 +120,7 @@ type JSONResponse struct {
 //  `)); err != nil {
 //  	// TODO: Handle error.
 //  }
-func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
+func SendHTTPResponse(w http.ResponseWriter, v interface{}) {
 	var rsp JSONResponse
 	switch v.(type) {
 	// case string provides shorthand for sending an OK response with
@@ -151,19 +152,18 @@ func SendHTTPResponse(w http.ResponseWriter, v interface{}) error {
 			w.WriteHeader(200)
 			w.Write(j)
 		}
-		return nil
+		return
 	default:
-		w.WriteHeader(InternalServerError.statusCode)
+		w.WriteHeader(ErrInternalServer.statusCode)
 		rsp = JSONResponse{
 			Success: false,
-			Message: InternalServerError.Error(),
+			Message: ErrInternalServer.Error(),
 		}
 	}
 	b, err := json.Marshal(rsp)
 	if err != nil {
-		SendHTTPResponse(w, InternalServerError)
-		return err
+		SendHTTPResponse(w, ErrInternalServer)
+		log.Fatal(err)
 	}
 	w.Write(b)
-	return nil
 }

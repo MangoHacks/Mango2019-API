@@ -18,7 +18,7 @@ import (
 //  fmt.Println(prr.Email)
 func ReadJSONBodyIntoStruct(body io.ReadCloser, v interface{}) error {
 	if err := json.NewDecoder(body).Decode(&v); err != nil {
-		return &BadRequestError
+		return &ErrBadRequest
 	}
 	return nil
 }

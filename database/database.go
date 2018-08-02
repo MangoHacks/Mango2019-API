@@ -5,8 +5,10 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"strings"
-	"time"
+	"fmt"
+	"os"
+
+	"github.com/MangoHacks/Mango2019-API/models"
 )
 
 // Database Errors
@@ -31,6 +33,38 @@ type DB struct {
 	postgres *sql.DB
 }
 
+// Database Credentials
+//
+// These are the credentials necessary to initialize a
+// connection with the database.
+var (
+	///////////////////////
+	// Database Credentials
+	///////////////////////
+	DBUser     = os.Getenv("DB_USER")
+	DBPassword = os.Getenv("DB_PASSWORD")
+	DBName     = os.Getenv("DB_NAME")
+)
+
+// New returns a new connection to the specified PostgreSQL database.
+//
+// The credentials for the database are exepected to be exported and
+// will be pulled down from the environment.
+func New(database string) (*DB, error) {
+	if database == "postgres" {
+		dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+			DBUser, DBPassword, DBName)
+		db, err := sql.Open("postgres", dbinfo)
+		if err != nil {
+			return nil, err
+		}
+		return &DB{
+			postgres: db,
+		}, nil
+	}
+	return nil, nil
+}
+
 // InsertPreregistration inserts a new preregistration into the appropriate
 // database.
 func (db *DB) InsertPreregistration(email string) error {
@@ -40,23 +74,23 @@ func (db *DB) InsertPreregistration(email string) error {
 	return nil
 }
 
-func (db *DB) SelectPreregistration() error {
-	return nil
-}
-
-func (db *DB) postgresInsertPreregistrations(email string) error {
-	q := `INSERT INTO preregistrations(email, timestamp) 
-	VALUES($1, $2) 
-	RETURNING email`
-	if _, err := db.postgres.Exec(q, email, time.Now()); err != nil {
-		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return ErrDuplicate
+// SelectPreregistrations selects all the preregistrations from the appropriate database.
+func (db *DB) SelectPreregistrations() ([]models.Preregistration, error) {
+	var prrs []models.Preregistration
+	var err error
+	if db.postgres != nil {
+		prrs, err = db.postgresSelectPreregistrations()
+		if err != nil {
+			return nil, err
 		}
-		return err
 	}
-	return nil
+	return prrs, nil
 }
 
-func (db *DB) postgresSelectPreregistrations() error {
+// DeletePreregistration deletes the given preregistration from the appropriate database.
+func (db *DB) DeletePreregistration(email string) error {
+	if db.postgres != nil {
+		return db.postgresDeletePreregistration(email)
+	}
 	return nil
 }
