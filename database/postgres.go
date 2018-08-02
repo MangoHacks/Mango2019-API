@@ -14,17 +14,25 @@ import (
 
 // PostgreSQL Queries
 var (
+	// PostgresInsertPreregistrationQuery is the query used to insert into the
+	// preregistrations table.
 	PostgresInsertPreregistrationQuery = `
 		INSERT 
 		INTO preregistrations(email, timestamp) 
 		VALUES($1, $2) 
 		RETURNING email
 	`
+
+	// PostgresSelectPreregistrationsQuery is the query used to select all preregistrations
+	// from the preregistrations table.
 	PostgresSelectPreregistrationsQuery = `
 		SELECT * 
 		FROM preregistrations
 		ORDER BY timestamp ASC
 	`
+
+	// PostgresDeletePreregistrationQuery is the query used to delete a preregistration
+	// from the preregistrations table.
 	PostgresDeletePreregistrationQuery = `
 		DELETE 
 		FROM preregistrations
