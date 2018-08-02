@@ -28,12 +28,17 @@ var (
 //
 // The credentials for the database are exepected to be exported and
 // will be pulled down from the environment.
-func New() (*sql.DB, error) {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-		DBUser, DBPassword, DBName)
-	db, err := sql.Open("postgres", dbinfo)
-	if err != nil {
-		return nil, err
+func New(database string) (*DB, error) {
+	if database == "postgres" {
+		dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
+			DBUser, DBPassword, DBName)
+		db, err := sql.Open("postgres", dbinfo)
+		if err != nil {
+			return nil, err
+		}
+		return &DB{
+			postgres: db,
+		}, nil
 	}
-	return db, nil
+	return nil, nil
 }

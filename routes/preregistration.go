@@ -60,7 +60,7 @@ func PostPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB
 //  		"email": "example2@google.com"
 //  	}
 //  ]
-func GetPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 	type preregistrations []struct {
 		Email     string    `json:"email"`
 		Timestamp time.Time `json:"timestamp"`
@@ -108,7 +108,7 @@ func GetPreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 //  {
 //  	"email": "example@google.com"
 //  }
-func DeletePreregistration(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func DeletePreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 	type preregisterRequest struct {
 		Email string `json:"email"`
 	}

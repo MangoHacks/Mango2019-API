@@ -1,16 +1,16 @@
 package server
 
 import (
-	"database/sql"
 	"net/http"
 
+	"github.com/MangoHacks/Mango2019-API/database"
 	"github.com/MangoHacks/Mango2019-API/web"
 
 	"github.com/MangoHacks/Mango2019-API/routes"
 )
 
 // handlePreregister handles a request to /preregister and sends them to the appropriate route.
-func handlePreregistration(db *sql.DB) http.HandlerFunc {
+func handlePreregistration(db *database.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			routes.PostPreregistration(w, r, db)
@@ -25,7 +25,7 @@ func handlePreregistration(db *sql.DB) http.HandlerFunc {
 }
 
 // handleRegister handles a request to /register and sends them to the appropriate route.
-func handleRegistration(db *sql.DB) http.HandlerFunc {
+func handleRegistration(db *database.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			routes.PostRegistration(w, r, db)

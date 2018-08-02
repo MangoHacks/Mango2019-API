@@ -35,12 +35,16 @@ type DB struct {
 // database.
 func (db *DB) InsertPreregistration(email string) error {
 	if db.postgres != nil {
-		return db.postgresInsertPreregistration(email)
+		return db.postgresInsertPreregistrations(email)
 	}
 	return nil
 }
 
-func (db *DB) postgresInsertPreregistration(email string) error {
+func (db *DB) SelectPreregistration() error {
+	return nil
+}
+
+func (db *DB) postgresInsertPreregistrations(email string) error {
 	q := `INSERT INTO preregistrations(email, timestamp) 
 	VALUES($1, $2) 
 	RETURNING email`
@@ -50,5 +54,9 @@ func (db *DB) postgresInsertPreregistration(email string) error {
 		}
 		return err
 	}
+	return nil
+}
+
+func (db *DB) postgresSelectPreregistrations() error {
 	return nil
 }
