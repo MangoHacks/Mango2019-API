@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/MangoHacks/Mango2019-API/models"
 )
@@ -29,22 +28,10 @@ var (
 // For the time being, planned support is for the following databases:
 // * PostgreSQL (Currently Supported / Used by MangoHacks 2019)
 // * MongoDB
+// * Google Firebase
 type DB struct {
 	postgres *sql.DB
 }
-
-// Database Credentials
-//
-// These are the credentials necessary to initialize a
-// connection with the database.
-var (
-	///////////////////////
-	// Database Credentials
-	///////////////////////
-	DBUser     = os.Getenv("DB_USER")
-	DBPassword = os.Getenv("DB_PASSWORD")
-	DBName     = os.Getenv("DB_NAME")
-)
 
 // New returns a new connection to the specified PostgreSQL database.
 //
@@ -53,7 +40,7 @@ var (
 func New(database string) (*DB, error) {
 	if database == "postgres" {
 		dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-			DBUser, DBPassword, DBName)
+			PostgresDBUser, PostgresDBPassword, PostgresDBName)
 		db, err := sql.Open("postgres", dbinfo)
 		if err != nil {
 			return nil, err

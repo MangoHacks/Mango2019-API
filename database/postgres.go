@@ -3,6 +3,7 @@
 package database
 
 import (
+	"os"
 	"strings"
 	"time"
 
@@ -12,7 +13,22 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// PostgreSQL Credentials
+//
+// These are the credentials necessary to initialize a
+// connection with the database.
+var (
+	/////////////////////////
+	// PostgreSQL Credentials
+	/////////////////////////
+	PostgresDBUser     = os.Getenv("POSTGRES_DB_USER")
+	PostgresDBPassword = os.Getenv("POSTGRES_DB_PASSWORD")
+	PostgresDBName     = os.Getenv("POSTGRES_DB_NAME")
+)
+
 // PostgreSQL Queries
+//
+// These are the queries used to read and modify the database.
 var (
 	// PostgresInsertPreregistrationQuery is the query used to insert into the
 	// preregistrations table.
