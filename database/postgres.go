@@ -3,6 +3,8 @@
 package database
 
 import (
+	"database/sql"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -21,9 +23,10 @@ var (
 	/////////////////////////
 	// PostgreSQL Credentials
 	/////////////////////////
-	PostgresDBUser     = os.Getenv("POSTGRES_DB_USER")
-	PostgresDBPassword = os.Getenv("POSTGRES_DB_PASSWORD")
-	PostgresDBName     = os.Getenv("POSTGRES_DB_NAME")
+	PostgresConnectionName = os.Getenv("POSTGRES_CONNECTION_NAME")
+	PostgresDBUser         = os.Getenv("POSTGRES_DB_USER")
+	PostgresDBPassword     = os.Getenv("POSTGRES_DB_PASSWORD")
+	PostgresDBName         = os.Getenv("POSTGRES_DB_NAME")
 )
 
 // PostgreSQL Queries
@@ -55,6 +58,17 @@ var (
 		WHERE email = $1
 	`
 )
+
+func newPostgres() (*sql.DB, error) {
+	dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+		PostgresConnectionName,
+		PostgresDBUser,
+		PostgresDBPassword,
+		PostgresDBName,
+	)
+	db, err := sql.Open("postgres", dbinfo)
+	return db, err
+}
 
 func (db *DB) postgresInsertPreregistrations(email string) error {
 	if _, err := db.postgres.Exec(PostgresInsertPreregistrationQuery, email, time.Now()); err != nil {

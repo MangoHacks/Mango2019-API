@@ -5,7 +5,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/MangoHacks/Mango2019-API/models"
 )
@@ -39,9 +38,7 @@ type DB struct {
 // will be pulled down from the environment.
 func New(database string) (*DB, error) {
 	if database == "postgres" {
-		dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable",
-			PostgresDBUser, PostgresDBPassword, PostgresDBName)
-		db, err := sql.Open("postgres", dbinfo)
+		db, err := newPostgres()
 		if err != nil {
 			return nil, err
 		}
