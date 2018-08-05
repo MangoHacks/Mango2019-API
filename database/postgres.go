@@ -38,8 +38,7 @@ var (
 	PostgresInsertPreregistrationQuery = `
 		INSERT 
 		INTO preregistrations(email, timestamp) 
-		VALUES($1, $2) 
-		RETURNING email
+		VALUES($1, $2)
 	`
 
 	// PostgresSelectPreregistrationsQuery is the query used to select all preregistrations
