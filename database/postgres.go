@@ -3,6 +3,9 @@
 package database
 
 import (
+	"database/sql"
+	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -12,15 +15,30 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// PostgreSQL Credentials
+//
+// These are the credentials necessary to initialize a
+// connection with the database.
+var (
+	/////////////////////////
+	// PostgreSQL Credentials
+	/////////////////////////
+	PostgresConnectionName = os.Getenv("POSTGRES_CONNECTION_NAME")
+	PostgresDBUser         = os.Getenv("POSTGRES_DB_USER")
+	PostgresDBPassword     = os.Getenv("POSTGRES_DB_PASSWORD")
+	PostgresDBName         = os.Getenv("POSTGRES_DB_NAME")
+)
+
 // PostgreSQL Queries
+//
+// These are the queries used to read and modify the database.
 var (
 	// PostgresInsertPreregistrationQuery is the query used to insert into the
 	// preregistrations table.
 	PostgresInsertPreregistrationQuery = `
 		INSERT 
 		INTO preregistrations(email, timestamp) 
-		VALUES($1, $2) 
-		RETURNING email
+		VALUES($1, $2)
 	`
 
 	// PostgresSelectPreregistrationsQuery is the query used to select all preregistrations
@@ -39,6 +57,17 @@ var (
 		WHERE email = $1
 	`
 )
+
+func newPostgres() (*sql.DB, error) {
+	dbinfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+		PostgresConnectionName,
+		PostgresDBUser,
+		PostgresDBPassword,
+		PostgresDBName,
+	)
+	db, err := sql.Open("postgres", dbinfo)
+	return db, err
+}
 
 func (db *DB) postgresInsertPreregistrations(email string) error {
 	if _, err := db.postgres.Exec(PostgresInsertPreregistrationQuery, email, time.Now()); err != nil {
