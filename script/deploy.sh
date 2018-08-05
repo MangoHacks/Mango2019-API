@@ -4,6 +4,13 @@ export COMMIT=${TRAVIS_COMMIT::8}
 export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 
+if [ "${BRANCH}" == "master" ]
+then
+    export TAG=latest
+else
+    export TAG=${BRANCH}-${COMMIT}
+fi
+
 # Decrypt and untar our keys
 openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in secrets.tar.enc -out secrets.tar -d
 tar xvf secrets.tar
@@ -20,7 +27,7 @@ gcloud version
 gcloud auth activate-service-account --key-file client-secret.json
 
 # Push to Docker registry.
-gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${BRANCH}-${COMMIT}
+gcloud docker -- push ${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${TAG}
 
 # Install Kubernetes.
 gcloud components install kubectl
@@ -30,4 +37,4 @@ mkdir $HOME/.kube
 mv config $HOME/.kube/config
 
 # Update on Kubernetes.
-kubectl set image deployment/mangohacks2019-api mangohacks2019-api=${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${BRANCH}-${COMMIT}
+kubectl set image deployment/mangohacks2019-api mangohacks2019-api=${HOST_NAME}/${PROJECT_ID}/${IMAGE_NAME}:${TAG}
