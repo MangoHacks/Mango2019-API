@@ -53,7 +53,7 @@ func New(database string) (*DB, error) {
 // database.
 func (db *DB) InsertPreregistration(email string) error {
 	if db.postgres != nil {
-		return db.postgresInsertPreregistrations(email)
+		return db.postgresInsertPreregistration(email)
 	}
 	return nil
 }

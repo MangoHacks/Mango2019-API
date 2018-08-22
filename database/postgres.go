@@ -69,7 +69,7 @@ func newPostgres() (*sql.DB, error) {
 	return db, err
 }
 
-func (db *DB) postgresInsertPreregistrations(email string) error {
+func (db *DB) postgresInsertPreregistration(email string) error {
 	if _, err := db.postgres.Exec(PostgresInsertPreregistrationQuery, email, time.Now()); err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			return ErrDuplicate

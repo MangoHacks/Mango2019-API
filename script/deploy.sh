@@ -1,15 +1,4 @@
-# Set env vars
-export IMAGE_NAME=mangohacks2019-api
-export COMMIT=${TRAVIS_COMMIT::8}
-export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
-
-if [ "${BRANCH}" == "master" ]
-then
-    export TAG=latest
-else
-    export TAG=${BRANCH}-${COMMIT}
-fi
+source bootstrap.sh
 
 # Decrypt and untar our keys
 openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in secrets.tar.enc -out secrets.tar -d
