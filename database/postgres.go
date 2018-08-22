@@ -11,7 +11,8 @@ import (
 
 	"github.com/MangoHacks/Mango2019-API/models"
 
-	// To avoid using pq directly.
+	// Database driver.
+	_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/postgres"
 	_ "github.com/lib/pq"
 )
 
@@ -65,7 +66,7 @@ func newPostgres() (*sql.DB, error) {
 		PostgresDBPassword,
 		PostgresDBName,
 	)
-	db, err := sql.Open("postgres", dbinfo)
+	db, err := sql.Open("cloudsqlpostgres", dbinfo)
 	return db, err
 }
 
