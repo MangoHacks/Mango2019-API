@@ -1,4 +1,4 @@
-source bootstrap.sh
+source ./bootstrap.sh
 
 # Docker build and tag image
 docker build -t ${IMAGE_NAME}:${TAG} .
