@@ -22,7 +22,7 @@ import (
 func PostPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB) {
 	var prr models.Preregistration
 	if err := web.ReadJSONBodyIntoStruct(r.Body, &prr); err != nil {
-		web.SendHTTPResponse(w, web.ErrBadRequest)
+		web.SendHTTPResponse(w, err)
 		return
 	}
 
@@ -53,11 +53,12 @@ func GetPreregistration(w http.ResponseWriter, r *http.Request, db *database.DB)
 	prrs, err := db.SelectPreregistrations()
 	if err != nil {
 		web.SendHTTPResponse(w, web.ErrInternalServer)
-		log.Printf("encountered error while retrieving preregistrations: %s" + err.Error())
+		log.Printf("encountered error while retrieving preregistrations: %v", err)
+		return
 	}
 	b, err := json.Marshal(prrs)
 	if err != nil {
-		log.Printf("encountered error while marshalling preregistrations: %s" + err.Error())
+		log.Printf("encountered error while marshalling preregistrations: %v", err)
 		return
 	}
 	web.SendHTTPResponse(w, b)

@@ -12,13 +12,14 @@ import (
 // handlePreregister handles a request to /preregister and sends them to the appropriate route.
 func handlePreregistration(db *database.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
+		switch r.Method {
+		case "POST":
 			routes.PostPreregistration(w, r, db)
-		} else if r.Method == "GET" {
+		case "GET":
 			routes.GetPreregistration(w, r, db)
-		} else if r.Method == "DELETE" {
+		case "DELETE":
 			routes.DeletePreregistration(w, r, db)
-		} else {
+		default:
 			web.SendHTTPResponse(w, web.ErrMethodNotAllowed)
 		}
 	}
@@ -27,13 +28,14 @@ func handlePreregistration(db *database.DB) http.HandlerFunc {
 // handleRegister handles a request to /register and sends them to the appropriate route.
 func handleRegistration(db *database.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
+		switch r.Method {
+		case "POST":
 			routes.PostRegistration(w, r, db)
-		} else if r.Method == "GET" {
+		case "GET":
 			routes.GetRegistration(w, r, db)
-		} else if r.Method == "DELETE" {
+		case "DELETE":
 			routes.DeleteRegistration(w, r, db)
-		} else {
+		default:
 			web.SendHTTPResponse(w, web.ErrMethodNotAllowed)
 		}
 	}
