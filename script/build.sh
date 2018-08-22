@@ -1,4 +1,6 @@
-source ./bootstrap.sh
+this_dir=`dirname $0`
+
+source $this_dir/bootstrap.sh
 
 # Docker build and tag image
 docker build -t ${IMAGE_NAME}:${TAG} .

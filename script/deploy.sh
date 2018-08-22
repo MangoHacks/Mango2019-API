@@ -1,4 +1,6 @@
-source ./bootstrap.sh
+this_dir=`dirname $0`
+
+source $this_dir/bootstrap.sh
 
 # Decrypt and untar our keys
 openssl aes-256-cbc -K $encrypted_f24c28559e81_key -iv $encrypted_f24c28559e81_iv -in secrets.tar.enc -out secrets.tar -d
