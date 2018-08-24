@@ -15,10 +15,10 @@ func handlePreregistration(db *database.DB) http.HandlerFunc {
 		switch r.Method {
 		case "POST":
 			routes.PostPreregistration(w, r, db)
-		case "GET":
-			routes.GetPreregistration(w, r, db)
-		case "DELETE":
-			routes.DeletePreregistration(w, r, db)
+		// case "GET":
+		// 	routes.GetPreregistration(w, r, db)
+		// case "DELETE":
+		// 	routes.DeletePreregistration(w, r, db)
 		default:
 			web.SendHTTPResponse(w, web.ErrMethodNotAllowed)
 		}
@@ -31,8 +31,8 @@ func handleRegistration(db *database.DB) http.HandlerFunc {
 		switch r.Method {
 		case "POST":
 			routes.PostRegistration(w, r, db)
-		case "GET":
-			routes.GetRegistration(w, r, db)
+		// case "GET":
+		// 	routes.GetRegistration(w, r, db)
 		case "DELETE":
 			routes.DeleteRegistration(w, r, db)
 		default:

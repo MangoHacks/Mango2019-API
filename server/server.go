@@ -44,8 +44,8 @@ func (s *Server) bindHandlers() {
 func (s *Server) Start() error {
 	s.bindHandlers()
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"https://mangohacks.com"},
-		AllowedMethods: []string{"POST", "OPTIONS"},
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"POST", "OPTIONS", "GET"},
 	})
 	return http.ListenAndServe(":9000", c.Handler(s.router))
 }
