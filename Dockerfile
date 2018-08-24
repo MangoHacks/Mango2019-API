@@ -11,7 +11,7 @@ RUN dep ensure --vendor-only
 COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /app .
 
-FROM scratch
+FROM drone/ca-certs
 COPY --from=builder /app ./
 
 CMD ["./app"]
