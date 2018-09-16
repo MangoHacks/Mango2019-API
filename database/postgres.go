@@ -60,8 +60,8 @@ var (
 	`
 
 	PostgresCreatePreregistrationTableQuery = `
-		CREATE TABLE preregistrations IF NOT EXISTS (
-			email VARCHAR (50) PRIMARY KEY
+		CREATE TABLE IF NOT EXISTS preregistrations (
+			email VARCHAR (256) PRIMARY KEY
 			timestamp TIMESTAMP NOT NULL
 		)
 	`
