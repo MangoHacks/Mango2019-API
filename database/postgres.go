@@ -5,6 +5,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -57,6 +58,13 @@ var (
 		FROM preregistrations
 		WHERE email = $1
 	`
+
+	PostgresCreatePreregistrationTableQuery = `
+		CREATE TABLE preregistrations IF NOT EXISTS (
+			email VARCHAR (50) PRIMARY KEY
+			timestamp TIMESTAMP NOT NULL
+		)
+	`
 )
 
 func newPostgres() (*sql.DB, error) {
@@ -67,6 +75,10 @@ func newPostgres() (*sql.DB, error) {
 		PostgresDBName,
 	)
 	db, err := sql.Open("cloudsqlpostgres", dbinfo)
+	if _, err := db.Exec(PostgresCreatePreregistrationTableQuery); err != nil {
+		log.Println(err)
+	}
+
 	return db, err
 }
 
