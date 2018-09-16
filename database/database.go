@@ -5,6 +5,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"log"
 
 	"github.com/MangoHacks/Mango2019-API/models"
 )
@@ -42,6 +43,7 @@ func New(database string) (*DB, error) {
 		if err != nil {
 			return nil, err
 		}
+		log.Println("Successfully connected.")
 		return &DB{
 			postgres: db,
 		}, nil
